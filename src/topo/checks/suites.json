@@ -1,0 +1,36 @@
+[
+  {
+    "id": "topo",
+    "path": "src/topo/checks/core/Aha.CoreChecks.csproj",
+    "kind": "dotnet",
+    "layer": "offline",
+    "local_fixtures": true
+  },
+  {
+    "id": "map",
+    "path": "src/topo/checks/map/topo-map-checks.cjs",
+    "kind": "node",
+    "layer": "offline"
+  },
+  {
+    "id": "geometry",
+    "path": "src/topo/checks/native/Aha.SurfaceChecks.csproj",
+    "kind": "rhino",
+    "layer": "rhino",
+    "type": "Aha.Topo.Checks.SurfaceCheckRunner",
+    "method": "Start",
+    "args": [
+      "All"
+    ],
+    "local_fixtures": true,
+    "local_args": ["Recorded"]
+  },
+  {
+    "id": "topo-service",
+    "path": "src/topo/checks/service/Aha.TopoServiceChecks.csproj",
+    "kind": "rhino",
+    "layer": "rhino",
+    "type": "Aha.Topo.Checks.TopoServiceChecks",
+    "method": "Start"
+  }
+]

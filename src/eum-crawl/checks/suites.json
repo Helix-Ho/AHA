@@ -1,0 +1,18 @@
+[
+  {
+    "id": "eum",
+    "path": "src/eum-crawl/checks/Aha.EumChecks.csproj",
+    "kind": "dotnet",
+    "layer": "offline",
+    "local_fixtures": true
+  },
+  {
+    "id": "eum-native",
+    "path": "src/eum-crawl/checks/native/Aha.EumNativeChecks.csproj",
+    "kind": "rhino",
+    "layer": "rhino",
+    "type": "Aha.EumCrawl.Checks.EumNativeChecks",
+    "method": "Start",
+    "local_fixtures": true
+  }
+]

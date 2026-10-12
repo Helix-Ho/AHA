@@ -1,0 +1,12 @@
+.env
+.env.*
+/.local/
+.DS_Store
+__pycache__/
+*.pyc
+/outputs/
+/.venv/
+/.tools/
+/src/**/bin/
+/src/**/obj/
+/dev/references/RhinoAI/RhinoAI/

@@ -1,0 +1,43 @@
+[
+  {
+    "id": "protocol",
+    "path": "src/aha/checks/core/Aha.ProtocolChecks.csproj",
+    "kind": "dotnet",
+    "layer": "offline",
+    "args": [
+      "--http"
+    ]
+  },
+  {
+    "id": "mcp-lifecycle",
+    "path": "src/aha/checks/lifecycle/Aha.McpLifecycleChecks.csproj",
+    "kind": "dotnet",
+    "layer": "offline"
+  },
+  {
+    "id": "runner-policy",
+    "path": "src/aha/checks/runner/test_runner.py",
+    "kind": "python",
+    "layer": "offline"
+  },
+  {
+    "id": "package-policy",
+    "path": "src/aha/checks/package/check_package.py",
+    "kind": "python",
+    "layer": "offline"
+  },
+  {
+    "id": "package-regression",
+    "path": "src/aha/checks/package/test_package.py",
+    "kind": "python",
+    "layer": "offline"
+  },
+  {
+    "id": "runtime",
+    "path": "src/aha/checks/native/Aha.RuntimeNativeChecks.csproj",
+    "kind": "rhino",
+    "layer": "rhino",
+    "type": "Aha.Checks.RuntimeWireChecks",
+    "method": "Start"
+  }
+]

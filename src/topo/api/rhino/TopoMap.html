@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+<style>
+html,body{margin:0;height:100%;overflow:hidden;font:12px system-ui;background:#e9eee9;color:#14342b}
+#map{height:100%;position:relative;overflow:hidden;cursor:crosshair;touch-action:none;user-select:none}
+#tiles,#overlay{position:absolute;inset:0;pointer-events:none}#tiles img{position:absolute;width:256px;height:256px}#overlay{width:100%;height:100%}
+#buttons{position:absolute;top:12px;left:12px;display:flex;gap:5px}button{width:32px;height:32px;border:1px solid #ccd7cd;border-radius:5px;background:white;font-size:21px;cursor:pointer}
+#legend{position:absolute;right:8px;bottom:8px;padding:4px 7px;background:#fffffff0;border-radius:4px;font-size:11px;pointer-events:none}.parcel{stroke:#e96835;fill:#fa713b22;stroke-width:2}.parcel-inner{stroke:#b46b4680;fill:none;stroke-width:1;stroke-dasharray:2 2}.extent{stroke:#008471;fill:#0084710b;stroke-width:2;stroke-dasharray:6 4}.near{stroke:#7b4bb6;fill:#7b4bb618;stroke-width:2}.near-invalid{stroke:#c83030;fill:#c8303020;stroke-width:2}
+</style></head><body><div id="map"><div id="tiles"></div><svg id="overlay"></svg><div id="buttons"><button id="plus" aria-label="확대">+</button><button id="minus" aria-label="축소">−</button></div><div id="legend">주황: 합친 대지 · 초록: 모델 범위</div></div>
+<script>
+'use strict';
+// A bounded tile viewer. All network access is in C#; no API key enters this page.
+const el=document.getElementById('map'), tiles=document.getElementById('tiles'), svg=document.getElementById('overlay');
+let lon=126.9782,lat=37.5666,z=16,rings=[],parcels=[],nearRings=[],nearValid=true,bounds=null,drag=null;
+const generation='__AHA_MAP_GENERATION__';
+const send=o=>window.eto.postMessage(JSON.stringify({...o,generation}));
+function world(lo,la){const n=256*2**z,s=Math.sin(la*Math.PI/180);return [(lo+180)/360*n,(.5-Math.log((1+s)/(1-s))/(4*Math.PI))*n]}
+function geo(x,y){const n=256*2**z;return [x/n*360-180,Math.atan(Math.sinh(Math.PI*(1-2*y/n)))*180/Math.PI]}
+function position(lo,la){const p=world(lo,la),c=world(lon,lat);return [p[0]-c[0]+el.clientWidth/2,p[1]-c[1]+el.clientHeight/2]}
+function overlays(){
+  svg.replaceChildren();
+  svg.setAttribute('viewBox',`0 0 ${el.clientWidth} ${el.clientHeight}`);
+  function path(contours,cls,close=true){
+    if(!contours.length)return;
+    const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d',contours.map(points=>points.map((v,i)=>(i?'L':'M')+position(v[0],v[1]).join(',')).join(' ')+(close?' Z':'')).join(' '));
+    p.setAttribute('class',cls);p.setAttribute('fill-rule','evenodd');
+    svg.appendChild(p);
+  }
+  if(bounds){const [w,s,e,n]=bounds;path([[[w,s],[e,s],[e,n],[w,n]]],'extent')}
+  // Keep an out-of-bounds circle visible so the rejected extent is understandable.
+  path(nearRings,nearValid?'near':'near-invalid');
+  for(const parcel of parcels)for(const polygon of parcel.polygons)path(polygon,'parcel-inner');
+  path(rings,'parcel');
+}
+function render(){const c=world(lon,lat),left=c[0]-el.clientWidth/2,top=c[1]-el.clientHeight/2,req=[];tiles.replaceChildren();for(let y=Math.floor(top/256);y<=Math.floor((top+el.clientHeight)/256);y++)for(let x=Math.floor(left/256);x<=Math.floor((left+el.clientWidth)/256);x++){const img=document.createElement('img');img.dataset.id=`${z}/${x}/${y}`;img.style.left=(x*256-left)+'px';img.style.top=(y*256-top)+'px';tiles.appendChild(img);req.push({z,x,y})}overlays();send({type:'tiles',tiles:req})}
+window.aha={
+  refresh(){scheduleRender()},
+  center(p){lon=p.lon;lat=p.lat;z=p.zoom??z;render()},
+  fit(p){const[w,s,e,n]=p.bounds;lon=(w+e)/2;lat=(s+n)/2;z=19;while(z>7){const a=world(w,s),b=world(e,n);if(Math.abs(b[0]-a[0])<el.clientWidth*.72&&Math.abs(b[1]-a[1])<el.clientHeight*.65)break;z--}render()},
+  overlay(p){rings=p.rings??[];parcels=p.parcels??[];nearRings=p.nearRings??[];nearValid=p.nearValid??true;bounds=p.bounds??null;updateLegend();overlays()},
+  tile(id,data){for(const im of tiles.children)if(im.dataset.id===id)im.src=data}
+};
+function updateLegend(){document.getElementById('legend').textContent=nearRings.length?'주황: 합친 대지 · '+(nearValid?'보라: 근접 영역':'빨강: 근접 범위 확인')+' · 초록: 모델 범위':'주황: 합친 대지 · 초록: 모델 범위'}
+function inRing(p,ring){let inside=false;for(let i=0,j=ring.length-1;i<ring.length;j=i++){const a=ring[i],b=ring[j];if((a[1]>p[1])!==(b[1]>p[1])&&p[0]<(b[0]-a[0])*(p[1]-a[1])/(b[1]-a[1])+a[0])inside=!inside}return inside}
+function parcelAt(p,features){return features.find(parcel=>parcel.polygons.some(polygon=>polygon.length&&inRing(p,polygon[0])&&!polygon.slice(1).some(hole=>inRing(p,hole))))}
+function selectedAt(p){return parcelAt(p,parcels)}
+function zoom(d,x=el.clientWidth/2,y=el.clientHeight/2){
+  const next=Math.max(7,Math.min(19,z+d));if(next===z)return;
+  const c=world(lon,lat),anchor=geo(c[0]+x-el.clientWidth/2,c[1]+y-el.clientHeight/2);
+  z=next;const p=world(...anchor);[lon,lat]=geo(p[0]-x+el.clientWidth/2,p[1]-y+el.clientHeight/2);render();
+}
+document.getElementById('plus').onclick=()=>zoom(1);document.getElementById('minus').onclick=()=>zoom(-1);
+// Integer WMTS levels: accumulate small trackpad deltas, but never queue zooms
+// after a gesture or request multiple tile sets for one large wheel event.
+const wheelPixelsPerLevel=60,wheelIntervalMs=150,wheelIdleMs=250;
+let wheelDelta=0,wheelAt=-Infinity,wheelZoomAt=-Infinity;
+el.addEventListener('wheel',e=>{
+  if(!Number.isFinite(e.deltaY)||e.deltaY===0)return;
+  e.preventDefault();if(drag)return;
+  const now=performance.now(),delta=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?el.clientHeight:1);
+  if(now-wheelAt>wheelIdleMs||Math.sign(delta)!==Math.sign(wheelDelta))wheelDelta=0;
+  wheelAt=now;wheelDelta=Math.max(-wheelPixelsPerLevel,Math.min(wheelPixelsPerLevel,wheelDelta+delta));
+  if(Math.abs(wheelDelta)<wheelPixelsPerLevel||now-wheelZoomAt<wheelIntervalMs)return;
+  const direction=wheelDelta<0?1:-1;wheelDelta=0;wheelZoomAt=now;
+  const rect=el.getBoundingClientRect();zoom(direction,e.clientX-rect.left,e.clientY-rect.top);
+},{passive:false});
+el.onpointerdown=e=>{if(e.button!==0||e.target.closest('button'))return;el.setPointerCapture(e.pointerId);drag={x:e.clientX,y:e.clientY,c:world(lon,lat)}};
+el.onpointermove=e=>{if(!drag)return;const x=e.clientX-drag.x,y=e.clientY-drag.y;tiles.style.transform=svg.style.transform=`translate(${x}px,${y}px)`};
+el.onpointerup=e=>{if(e.button!==0||!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;tiles.style.transform=svg.style.transform='';if(Math.hypot(dx,dy)<4){const rect=el.getBoundingClientRect(),p=geo(drag.c[0]+e.clientX-rect.left-el.clientWidth/2,drag.c[1]+e.clientY-rect.top-el.clientHeight/2);const selected=selectedAt(p);if(selected)send({type:'remove',id:selected.id});else send({type:'pick',lon:p[0],lat:p[1]})}else{[lon,lat]=geo(drag.c[0]-dx,drag.c[1]-dy);render()}drag=null};
+el.onpointercancel=()=>{drag=null;tiles.style.transform=svg.style.transform=''};
+let resize;function scheduleRender(){clearTimeout(resize);resize=setTimeout(render,150)}
+window.onresize=scheduleRender;
+send({type:'ready'});
+</script></body></html>

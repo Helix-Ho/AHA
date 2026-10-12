@@ -1,0 +1,19 @@
+{
+  "pnu": "9900000000100010000",
+  "other_pnu": "9900000000100020000",
+  "address": "가상시 예시동 1-1",
+  "area_m2": 1234.5,
+  "area_text": "1,234.5 ㎡",
+  "zone": "제2종일반주거지역",
+  "other_law": "상대보호구역",
+  "mark_codes": "UA01;UA02;UR01;UR02",
+  "ordinance": "예시시 건축 조례",
+  "bcr_percent": 55,
+  "far_percent": 175,
+  "far_conditional_percent": 210,
+  "far_condition_text": "특별계획구역",
+  "ratio_date": "2024.02.03",
+  "setback_date": "2024.01.02",
+  "calculated_bcr_percent": 45,
+  "calculated_far_percent": 180
+}

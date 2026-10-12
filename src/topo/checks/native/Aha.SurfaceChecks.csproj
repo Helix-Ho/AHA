@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>Aha.SurfaceChecks</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <RhinoSystemDir Condition="'$(RhinoSystemDir)' == ''">/Applications/Rhino 8.app/Contents/Frameworks/RhCore.framework/Versions/A/Resources</RhinoSystemDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../FixtureData.cs" Link="FixtureData.cs" />
+    <PackageReference Include="Clipper2" Version="2.0.0" />
+    <PackageReference Include="NetTopologySuite" Version="2.6.0" />
+    <Reference Include="RhinoCommon"><HintPath>$(RhinoSystemDir)/RhinoCommon.dll</HintPath><Private>false</Private></Reference>
+    <Compile Include="../../shared/**/*.cs" Link="Shared/%(Filename)%(Extension)" />
+    <Compile Include="../../../info/shared/*.cs" Link="Info/%(Filename)%(Extension)" />
+    <Compile Include="../../api/rhino/Core/*.cs" Link="Core/%(Filename)%(Extension)" />
+    <Compile Include="../core/HullChecks.cs" Link="Checks/HullChecks.cs" />
+    <Compile Include="../core/ModelPlanFixtures.cs" Link="Checks/ModelPlanFixtures.cs" />
+    <Compile Include="../core/ParapetProfileChecks.cs" Link="Checks/ParapetProfileChecks.cs" />
+    <None Include="../fixtures/*.json" Link="fixtures/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

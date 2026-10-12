@@ -1,0 +1,16 @@
+[
+  {
+    "id": "info",
+    "path": "src/info/checks/Aha.InfoChecks.csproj",
+    "kind": "dotnet",
+    "layer": "offline"
+  },
+  {
+    "id": "info-native",
+    "path": "src/info/checks/native/Aha.InfoNativeChecks.csproj",
+    "kind": "rhino",
+    "layer": "rhino",
+    "type": "Aha.Info.Checks.InfoNativeChecks",
+    "method": "RunSafe"
+  }
+]

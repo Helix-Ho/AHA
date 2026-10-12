@@ -1,0 +1,16 @@
+[
+  {
+    "id": "setting",
+    "path": "src/setting/checks/Aha.SettingChecks.csproj",
+    "kind": "dotnet",
+    "layer": "offline"
+  },
+  {
+    "id": "setting-native",
+    "path": "src/setting/checks/native/Aha.SettingNativeChecks.csproj",
+    "kind": "rhino",
+    "layer": "rhino",
+    "type": "Aha.Setting.Checks.SettingNativeChecks",
+    "method": "Start"
+  }
+]

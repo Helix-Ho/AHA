@@ -1,0 +1,9 @@
+name: aha
+version: @AHA_VERSION@
+authors:
+  - AHA
+description: Rhino architectural tools — Topo, Info, Setting and experimental EumCrawl. Includes a local MCP endpoint.
+keywords:
+  - architecture
+  - topography
+  - mcp

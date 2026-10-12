@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>Aha.RuntimeNativeChecks</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <RhinoSystemDir Condition="'$(RhinoSystemDir)' == ''">/Applications/Rhino 8.app/Contents/Frameworks/RhCore.framework/Versions/A/Resources</RhinoSystemDir>
+    <AhaAssemblyPath Condition="'$(AhaAssemblyPath)' == ''">../../rhino/bin/$(Configuration)/net8.0/Aha.rhp</AhaAssemblyPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="RuntimeNativeChecks.cs;BuildIdentity.cs;RuntimeWireChecks.cs" />
+    <!-- Compile against the product. Rhino must have already loaded the installed Aha assembly. -->
+    <Reference Include="Aha"><HintPath>$(AhaAssemblyPath)</HintPath><Private>false</Private></Reference>
+    <Reference Include="RhinoCommon"><HintPath>$(RhinoSystemDir)/RhinoCommon.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Eto"><HintPath>$(RhinoSystemDir)/Eto.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>

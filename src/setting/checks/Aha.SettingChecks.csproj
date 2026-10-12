@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../rhino/SettingsStore.cs" Link="SettingsStore.cs" />
+    <Compile Include="../rhino/McpAddress.cs" Link="McpAddress.cs" />
+    <Compile Include="../rhino/MacKeychain.cs" Link="MacKeychain.cs" />
+    <Compile Include="../rhino/AhaSettings.cs" Link="AhaSettings.cs" />
+    <Compile Include="../rhino/KeyControlState.cs" Link="KeyControlState.cs" />
+    <Compile Include="../rhino/VWorldKeyState.cs" Link="VWorldKeyState.cs" />
+    <Compile Include="../rhino/CredentialAccess.cs" Link="CredentialAccess.cs" />
+    <Compile Remove="native/**" />
+  </ItemGroup>
+</Project>

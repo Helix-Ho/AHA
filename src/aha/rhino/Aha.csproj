@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <TargetExt>.rhp</TargetExt>
+    <AssemblyName>Aha</AssemblyName>
+    <RootNamespace>Aha</RootNamespace>
+    <Description>AHA architectural tools for Rhino</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RhinoSystemDir Condition="'$(RhinoSystemDir)' == ''">/Applications/Rhino 8.app/Contents/Frameworks/RhCore.framework/Versions/A/Resources</RhinoSystemDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../mcp/**/*.cs;../../setting/rhino/**/*.cs;../../info/rhino/**/*.cs;../../eum-crawl/rhino/**/*.cs;../../topo/api/rhino/**/*.cs;../../topo/shared/**/*.cs" Exclude="**/obj/**;**/bin/**" />
+    <Compile Include="../../info/shared/**/*.cs;../../eum-crawl/shared/**/*.cs" Exclude="**/obj/**;**/bin/**" />
+    <EmbeddedResource Include="../../topo/api/rhino/TopoMap.html" LogicalName="Aha.Topo.TopoMap.html" />
+    <EmbeddedResource Include="Icons/*.ico" LogicalName="Aha.Icons.%(Filename)%(Extension)" />
+    <EmbeddedResource Include="../assets/logo/AHA_Logo_mono.svg" LogicalName="Aha.Logo.svg" />
+    <None Include="../../topo/api/rhino/THIRD_PARTY_NOTICES.txt" Link="THIRD_PARTY_NOTICES.txt" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../package/Aha.rui" Link="Aha.rui" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../../LICENSE" Link="LICENSE" CopyToOutputDirectory="PreserveNewest" />
+    <PackageReference Include="Clipper2" Version="2.0.0" />
+    <PackageReference Include="NetTopologySuite" Version="2.6.0" />
+    <Reference Include="RhinoCommon"><HintPath>$(RhinoSystemDir)/RhinoCommon.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Eto"><HintPath>$(RhinoSystemDir)/Eto.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Rhino.UI"><HintPath>$(RhinoSystemDir)/Rhino.UI.dll</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+</Project>
